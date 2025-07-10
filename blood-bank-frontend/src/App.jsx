@@ -6,7 +6,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
-import HomePage from "./pages/Homepage.jsx";
+import HomePage from "./pages/HomePage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
