@@ -1,0 +1,32 @@
+{
+  "name": "blood-bank-backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+       "dev": "cross-env NODE_ENV=development nodemon src/index.js"
+
+  },
+  "keywords": [
+    "blood-bank",
+    "express",
+    "nodejs"
+  ],
+  "author": "Nirajan Rokaya",
+  "license": "ISC",
+  "description": "Backend API for the Blood Bank application.",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.15.1",
+    "nodemailer": "^7.0.3"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "nodemon": "^3.1.10"
+  }
+}
