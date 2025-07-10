@@ -20,7 +20,7 @@ const HomePage = () => {
           </div>
           <div className="col-md-6 about-img text-center">
             <img
-              src="/public/donation.jpg"
+              src="/donation.jpg"
               alt="Donate blood"
               className="img-fluid shadow"
               style={{

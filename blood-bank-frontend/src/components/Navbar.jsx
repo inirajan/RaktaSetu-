@@ -74,7 +74,7 @@ const Navbar = () => {
       <Container>
         <BootstrapNavbar.Brand as={Link} to="/">
           <img
-            src="/public/5-logo.png"
+            src="/5-logo.png"
             alt="Blood Bank Logo"
             className="navbar-logo me-0"
           />
@@ -90,7 +90,7 @@ const Navbar = () => {
                 className="nav-link-with-icon home-link"
               >
                 <img
-                  src="/public/1-home.png"
+                  src="/1-home.png"
                   alt="Home Icon"
                   className="navbar-icon me-2"
                 />
@@ -106,7 +106,7 @@ const Navbar = () => {
                   className="nav-link-with-icon admin-link"
                 >
                   <img
-                    src="/public/2-admin.png"
+                    src="/2-admin.png"
                     alt="Admin Icon"
                     className="navbar-icon me-2"
                   />
@@ -118,7 +118,7 @@ const Navbar = () => {
                   className="nav-link-with-icon donor-link"
                 >
                   <img
-                    src="/public/3-donor.png"
+                    src="/3-donor.png"
                     alt="Donor Icon"
                     className="navbar-icon me-2"
                   />
@@ -130,7 +130,7 @@ const Navbar = () => {
                   className="nav-link-with-icon patient-link"
                 >
                   <img
-                    src="/public/4-patient.png"
+                    src="/4-patient.png"
                     alt="Patient Icon"
                     className="navbar-icon me-2"
                   />
