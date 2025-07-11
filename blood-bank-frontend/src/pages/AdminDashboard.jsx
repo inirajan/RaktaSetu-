@@ -7,7 +7,7 @@ import {
   getAllBloodRequestsAdmin,
   handleBloodRequestAdmin,
   getDonorsByBloodGroupAdmin,
-  sendDonorInfoToRequesterAdmin, // Keep this import for the new functionality
+  sendDonorInfoToRequesterAdmin,
 } from "../services/api.js";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -20,7 +20,7 @@ import {
   Button as BootstrapButton,
   Spinner,
   Alert,
-  Modal, // Keep Modal import for the admin's view/send confirmation
+  Modal,
 } from "react-bootstrap";
 import Input from "../components/Input.jsx";
 
@@ -47,8 +47,8 @@ const AdminDashboard = () => {
   // States for handling the admin's 'Send Donor Info' modal
   const [showDonorInfoModal, setShowDonorInfoModal] = useState(false);
   const [currentRequestDetailsForModal, setCurrentRequestDetailsForModal] =
-    useState(null); // Changed name for clarity
-  const [potentialDonorsForModal, setPotentialDonorsForModal] = useState([]); // Changed name for clarity
+    useState(null);
+  const [potentialDonorsForModal, setPotentialDonorsForModal] = useState([]);
 
   const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
@@ -150,45 +150,42 @@ const AdminDashboard = () => {
     }
   };
 
-  // Reverted handleBloodRequestAction: This now only handles the admin's approval/rejection decision.
-  // It no longer tries to fetch or display donor info directly.
+  //admin's approval/rejection
+
   const handleBloodRequestAction = async (requestId, action, comments = "") => {
     try {
       await handleBloodRequestAdmin(requestId, action, comments);
       alert(`Blood request ${action}ed successfully!`);
-      fetchAllRequests(); // Always re-fetch requests to update UI
+      fetchAllRequests(); // re-fetch requests to update UI
     } catch (err) {
       console.error("Error handling blood request:", err);
-      // Display general error message if it's not the specific '0 units' rejection
+
       alert(
         `Failed to ${action} blood request: ${
           err.message || "An unknown error occurred."
         }`
       );
-      fetchAllRequests(); // Always re-fetch requests to update UI even on error
+      fetchAllRequests();
     }
   };
 
-  // NEW: Handler for sending donor info from Admin Dashboard
+  // Handler for sending donor info from Admin Dashboard
   const handleSendDonorInfo = async (request) => {
     // Pass the whole request object
-    setPotentialDonorsForModal([]); // Clear previous data
+    setPotentialDonorsForModal([]);
     setCurrentRequestDetailsForModal(null);
 
     try {
-      // Call the new API to store donor info with the request
       const response = await sendDonorInfoToRequesterAdmin(request._id);
 
-      // Now fetch the actual donor list for display in the modal from the response
-      // The backend should return `potentialDonors` in its data
       setPotentialDonorsForModal(response.data.potentialDonors || []);
-      setCurrentRequestDetailsForModal(request); // Use the original request details for modal display
-      setShowDonorInfoModal(true); // Show the modal
+      setCurrentRequestDetailsForModal(request);
+      setShowDonorInfoModal(true);
 
       alert(
         "Donor information prepared and linked to the blood request for the requester to view."
       );
-      fetchAllRequests(); // Refresh requests to reflect the change (e.g., the matchedDonorsInfo field will now be populated)
+      fetchAllRequests();
     } catch (err) {
       console.error("Error sending donor info:", err);
       alert(
@@ -318,7 +315,7 @@ const AdminDashboard = () => {
           </Card>
         </Col>
       </Row>
-      <hr className="my-4" /> {/* Retained original HR tag */}
+      <hr className="my-4" />
       <Card className="shadow-sm mb-4">
         <Card.Body>
           <Card.Title className="text-danger mb-3">User Management</Card.Title>
@@ -332,7 +329,7 @@ const AdminDashboard = () => {
           </div>
         </Card.Body>
       </Card>
-      <hr className="my-4" /> {/* Retained original HR tag */}
+      <hr className="my-4" />
       {/* Donor Search by Blood Group */}
       <Card className="shadow-sm mb-4">
         <Card.Body>
@@ -418,7 +415,7 @@ const AdminDashboard = () => {
           )}
         </Card.Body>
       </Card>
-      <hr className="my-4" /> {/* Retained original HR tag */}
+      <hr className="my-4" />
       <Card className="shadow-sm mb-4">
         <Card.Body>
           <Card.Title className="text-danger mb-3">
@@ -472,7 +469,7 @@ const AdminDashboard = () => {
           </Row>
         </Card.Body>
       </Card>
-      <hr className="my-4" /> {/* Retained original HR tag */}
+      <hr className="my-4" />
       <Card className="shadow-sm mb-4">
         <Card.Body>
           <Card.Title className="text-danger mb-3">
@@ -552,7 +549,7 @@ const AdminDashboard = () => {
           )}
         </Card.Body>
       </Card>
-      <hr className="my-4" /> {/* Retained original HR tag */}
+      <hr className="my-4" />
       <Card className="shadow-sm">
         <Card.Body>
           <Card.Title className="text-danger mb-3">Blood Requests</Card.Title>
@@ -640,7 +637,7 @@ const AdminDashboard = () => {
                             </BootstrapButton>
                           </div>
                         )}
-                        {/* Only show 'Send Donor Info' if rejected AND info hasn't been sent yet */}
+                        {/*  show 'Send Donor Info' if rejected */}
                         {request.status === "Rejected" &&
                           (!request.matchedDonorsInfo ||
                             request.matchedDonorsInfo.length === 0) && (
@@ -648,23 +645,19 @@ const AdminDashboard = () => {
                               variant="info"
                               size="sm"
                               className="mt-2"
-                              onClick={
-                                () => handleSendDonorInfo(request) // Pass the full request object
-                              }
+                              onClick={() => handleSendDonorInfo(request)}
                             >
                               Send Donor Info
                             </BootstrapButton>
                           )}
-                        {/* Show 'View Sent Info' if rejected AND info HAS been sent */}
+
                         {request.status === "Rejected" &&
                           request.matchedDonorsInfo?.length > 0 && (
                             <BootstrapButton
                               variant="outline-info"
                               size="sm"
                               className="mt-2"
-                              onClick={
-                                () => handleSendDonorInfo(request) // Reuse to view info if already sent
-                              }
+                              onClick={() => handleSendDonorInfo(request)}
                             >
                               View Sent Info
                             </BootstrapButton>
@@ -678,7 +671,7 @@ const AdminDashboard = () => {
           )}
         </Card.Body>
       </Card>
-      {/* Admin's Donor Information Modal - for confirmation/viewing before/after sending */}
+
       <Modal
         show={showDonorInfoModal}
         onHide={() => setShowDonorInfoModal(false)}
