@@ -4,7 +4,7 @@ import {
   updateDonorAdmin,
   deleteDonorAdmin,
 } from "../services/api.js";
-import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
+import { Link, useNavigate } from "react-router-dom";
 import {
   Container,
   Row,
@@ -21,7 +21,7 @@ import Input from "../components/Input.jsx";
 
 const AdminDonorManagementPage = () => {
   const navigate = useNavigate();
-  const [currentUser, setCurrentUser] = useState(null); // Local state for logged-in user
+  const [currentUser, setCurrentUser] = useState(null);
   const [donors, setDonors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -31,7 +31,6 @@ const AdminDonorManagementPage = () => {
 
   const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
-  // Effect to verify authentication and load current user from localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     const storedAccessToken = localStorage.getItem("accessToken");

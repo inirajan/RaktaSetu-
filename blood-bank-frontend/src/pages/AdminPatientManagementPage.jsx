@@ -4,7 +4,7 @@ import {
   updatePatientAdmin,
   deletePatientAdmin,
 } from "../services/api.js";
-import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
+import { Link, useNavigate } from "react-router-dom";
 import {
   Container,
   Row,

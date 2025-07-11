@@ -2,9 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import {
-  getDonorBloodRequestHistory, // Import the API function to fetch history
-} from "../services/api.js"; // Adjust path as needed
+import { getDonorBloodRequestHistory } from "../services/api.js";
 import {
   Container,
   Card,
@@ -12,13 +10,13 @@ import {
   Spinner,
   Alert,
   Modal,
-  Button as BootstrapButton, // Import BootstrapButton for the action column
+  Button as BootstrapButton,
 } from "react-bootstrap";
 
 const DonorBloodRequestHistoryPage = () => {
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState(null);
-  const [bloodRequestHistory, setBloodRequestHistory] = useState([]); // Renamed from userBloodRequests for consistency with the file
+  const [bloodRequestHistory, setBloodRequestHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -46,7 +44,7 @@ const DonorBloodRequestHistoryPage = () => {
         return;
       }
       setCurrentUser(parsedUser);
-      fetchBloodRequestsHistory(); // Renamed function call
+      fetchBloodRequestsHistory();
     } catch (parseError) {
       console.error("Failed to parse stored user:", parseError);
       localStorage.removeItem("user");
@@ -56,7 +54,6 @@ const DonorBloodRequestHistoryPage = () => {
   }, [navigate]);
 
   const fetchBloodRequestsHistory = async () => {
-    // Renamed function
     setLoading(true);
     setError(null);
     try {
@@ -104,7 +101,6 @@ const DonorBloodRequestHistoryPage = () => {
 
       <Card className="shadow-sm mb-4">
         {" "}
-        {/* Added mb-4 for consistency */}
         <Card.Body>
           <Card.Title className="text-secondary mb-3">
             Your Blood Request History
@@ -121,7 +117,7 @@ const DonorBloodRequestHistoryPage = () => {
                     <th>Units</th>
                     <th>Status</th>
                     <th>Admin Comments</th>
-                    <th>Action</th> {/* Added Action column */}
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -158,8 +154,7 @@ const DonorBloodRequestHistoryPage = () => {
                           >
                             View Donor Info
                           </BootstrapButton>
-                        ) : // Optional: Message if no info sent for a rejected request
-                        request.status === "Rejected" &&
+                        ) : request.status === "Rejected" &&
                           request.adminComments?.includes(
                             "zero blood stock"
                           ) ? (
@@ -209,7 +204,6 @@ const DonorBloodRequestHistoryPage = () => {
                 </thead>
                 <tbody>
                   {currentDisplayedMatchedDonors.map((donor) => (
-                    // Using a combination for key as _id might not be consistent for lean objects
                     <tr key={donor._id || `${donor.email}-${donor.fullName}`}>
                       <td>{donor.fullName}</td>
                       <td>{donor.email}</td>
