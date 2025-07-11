@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from "react";
-import {
-  getPatientBloodRequestHistory, // Import the API function to fetch history
-} from "../services/api.js";
+import { getPatientBloodRequestHistory } from "../services/api.js";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Container,
   Spinner,
   Alert,
-  Table, // Ensure Table is imported for the donor info modal
+  Table,
   Card,
-  Modal, // Import Modal for the pop-up
-  Button as BootstrapButton, // Import Button for the action column
+  Modal,
+  Button as BootstrapButton,
 } from "react-bootstrap";
 
 const PatientBloodRequestHistoryPage = () => {
@@ -99,13 +97,11 @@ const PatientBloodRequestHistoryPage = () => {
       </h1>
       <Link to="/patient/profile" className="btn btn-secondary mb-3">
         {" "}
-        {/* Changed btn-link to btn-secondary for consistency */}
         &larr; Back to Profile
       </Link>
 
       <Card className="shadow-sm mb-4">
         {" "}
-        {/* Added mb-4 for consistency */}
         <Card.Body>
           {bloodRequestHistory.length === 0 ? (
             <Alert variant="info" className="mb-0">
@@ -121,7 +117,7 @@ const PatientBloodRequestHistoryPage = () => {
                     <th>Units</th>
                     <th>Status</th>
                     <th>Admin Comments</th>
-                    <th>Action</th> {/* NEW: Added Action column */}
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -148,7 +144,6 @@ const PatientBloodRequestHistoryPage = () => {
                       <td>{request.adminComments || "N/A"}</td>
                       <td>
                         {" "}
-                        {/* NEW: Cell for Action Button */}
                         {request.matchedDonorsInfo &&
                         request.matchedDonorsInfo.length > 0 ? (
                           <BootstrapButton
@@ -158,8 +153,7 @@ const PatientBloodRequestHistoryPage = () => {
                           >
                             View Donor Info
                           </BootstrapButton>
-                        ) : // Optional: Message if no info sent for a rejected request
-                        request.status === "Rejected" &&
+                        ) : request.status === "Rejected" &&
                           request.adminComments?.includes(
                             "zero blood stock"
                           ) ? (
@@ -177,7 +171,7 @@ const PatientBloodRequestHistoryPage = () => {
         </Card.Body>
       </Card>
 
-      {/* NEW MODAL: To display received donor info for the patient */}
+      {/*  display donor info for the patient */}
       <Modal
         show={showReceivedDonorInfoModal}
         onHide={() => setShowReceivedDonorInfoModal(false)}
@@ -209,7 +203,6 @@ const PatientBloodRequestHistoryPage = () => {
                 </thead>
                 <tbody>
                   {currentDisplayedMatchedDonors.map((donor) => (
-                    // Using a combination for key as _id might not be consistent for lean objects
                     <tr key={donor._id || `${donor.email}-${donor.fullName}`}>
                       <td>{donor.fullName}</td>
                       <td>{donor.email}</td>
