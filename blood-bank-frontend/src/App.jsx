@@ -20,7 +20,7 @@ import PatientBloodRequestHistoryPage from "./pages/PatientBloodRequestHistoryPa
 import VerificationStatusPage from "./pages/VerificationStatusPage.jsx";
 import { Spinner, Container } from "react-bootstrap";
 
-// Simplified Protected Route component
+//  Protected Route component
 const DirectProtectedRoute = ({ allowedRoles, children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState(null);
