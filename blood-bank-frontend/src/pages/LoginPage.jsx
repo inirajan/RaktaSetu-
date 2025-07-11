@@ -83,8 +83,6 @@ const LoginPage = () => {
   console.log("2", loginTitle);
 
   return (
-    // Removed 'vh-100' and 'align-items-center' for top positioning
-    // Added 'py-5' for vertical padding
     <Container className="d-flex justify-content-center py-5">
       <Card
         className="shadow-lg p-4"
