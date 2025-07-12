@@ -60,7 +60,7 @@ export const donorRegisterControl = asyncHandler(async (req, res) => {
     );
   }
 
-  const exstingDonor = await tempModel.findOne({ email });
+  const exstingDonor = await donorModel.findOne({ email });
   if (exstingDonor) {
     throw new apiError(
       409,
@@ -191,8 +191,8 @@ export const verifyEmail = asyncHandler(async (req, res) => {
   if (!tempDoc) {
     throw new apiError(
       404,
-      "Token Expired",
-      "The Token doesen't exists or expired"
+      "Verification Link Used or Expired",
+      "The Token doesn't exist or is expired/used"
     );
   }
 
@@ -201,7 +201,7 @@ export const verifyEmail = asyncHandler(async (req, res) => {
   });
 
   if (existingDonor) {
-    await tempModel.findOneAndDelete({ _id: temp._id }); // clean up temp record
+    await tempModel.findOneAndDelete({ _id: tempDoc._id }); // clean up temp record
     return res
       .status(200)
       .json(
@@ -212,6 +212,7 @@ export const verifyEmail = asyncHandler(async (req, res) => {
   const donor = await donorModel.create({
     ...tempDoc.data,
     isEmailVerified: true,
+    role: "donor",
   });
 
   if (!donor) {
@@ -230,7 +231,7 @@ export const verifyEmail = asyncHandler(async (req, res) => {
       new ApiResponse(
         201,
         { donorId: donor._id, email: donor.email },
-        "registeration complete"
+        "registration complete"
       )
     );
 });
@@ -242,7 +243,7 @@ export const donorLoginController = asyncHandler(async (req, res) => {
   if (!email || !password) {
     throw new apiError(
       400,
-      "Email and password is requires",
+      "Email and password are required",
       "Provide email and password"
     );
   }
@@ -254,18 +255,14 @@ export const donorLoginController = asyncHandler(async (req, res) => {
   }
 
   if (!donor.isEmailVerified) {
-    throw new apiError(
-      403,
-      "email is not verified",
-      "please check  your inbox"
-    );
+    throw new apiError(403, "Email is not verified", "Please check your inbox");
   }
 
   //checking valid password
   const isPasswordValid = await donor.isPasswordCorrect(password);
 
   if (!isPasswordValid) {
-    throw new apiError(403, "Invalid credentails", "provide password");
+    throw new apiError(403, "Invalid credentials", "Provide password");
   }
 
   const accessToken = await donor.generateAccessToken();
@@ -279,7 +276,7 @@ export const donorLoginController = asyncHandler(async (req, res) => {
 
   const loggedInDonor = {
     _id: donor._id,
-    name: donor.fullName,
+    fullName: donor.fullName,
     email: donor.email,
     role: donor.role,
   };
@@ -327,11 +324,10 @@ export const donorLogoutController = asyncHandler(async (req, res) => {
     .status(200)
     .clearCookie("accessToken", options)
     .clearCookie("refreshToken", options)
-    .json(new ApiResponse(200, {}, " successfully logout"));
+    .json(new ApiResponse(200, {}, " Successfully logged out"));
 });
 
 //Donation request management
-
 export const donationRequestController = asyncHandler(async (req, res) => {
   const { units, disease } = req.body;
   console.log("Body", req.body);
@@ -341,7 +337,7 @@ export const donationRequestController = asyncHandler(async (req, res) => {
   if (!units || units < 0) {
     throw new apiError(
       400,
-      "postive unit are required for a dontaion request",
+      "Positive unit amount is required for a donation request",
       " provide units"
     );
   }
@@ -400,18 +396,18 @@ export const requestBloodAsDonor = asyncHandler(async (req, res) => {
   const { bloodGroup, unit } = req.body;
   const donorId = req.user._id;
 
-  if (!bloodGroup || !unit || unit < 0) {
+  if (!bloodGroup || !unit || unit <= 0) {
     throw new apiError(
       400,
-      "blood group and blood units are positive",
-      " provide blood Group and unit"
+      "Blood group and positive units are required",
+      "Provide blood group and unit"
     );
   }
 
   const donorExists = await donorModel.findById(donorId);
 
   if (!donorExists) {
-    throw new apiError(404, "Donor not Found", "Proved Exsting Donor");
+    throw new apiError(404, "Donor not Found", "Provide Existing Donor");
   }
 
   const newBloodRequest = await bloodReqModel.create({
@@ -427,7 +423,7 @@ export const requestBloodAsDonor = asyncHandler(async (req, res) => {
     .status(201)
     .json(
       new ApiResponse(
-        200,
+        201,
         newBloodRequest,
         "Blood request submitted successfully"
       )
@@ -451,7 +447,7 @@ export const getBloodRequestHistroy = asyncHandler(async (req, res) => {
       new ApiResponse(
         200,
         bloodRequestHistory,
-        "Blood donation request history fetched successfully"
+        "Blood request history fetched successfully"
       )
     );
 });
@@ -465,13 +461,13 @@ export const getDonorProfile = asyncHandler(async (req, res) => {
     .select("-password -refreshToken");
 
   if (!donorProfile) {
-    throw new apiError(404, "donor profile not found", "donor doesnot exits");
+    throw new apiError(404, "Donor profile not found", "Donor does not exist");
   }
 
   return res
     .status(200)
     .json(
-      new ApiResponse(200, donorProfile, "Patient profile fetched successfully")
+      new ApiResponse(200, donorProfile, "Donor profile fetched successfully")
     );
 });
 
@@ -488,7 +484,6 @@ export const updateDonorProfile = asyncHandler(async (req, res) => {
   }
 
   //basic validation for update
-
   if (fullName && fullName.trim() === "") {
     throw new apiError(400, "Full name cannot be empty.", "Invalid full name");
   }
@@ -496,7 +491,7 @@ export const updateDonorProfile = asyncHandler(async (req, res) => {
   if (age !== undefined && (typeof age !== "number" || age <= 0 || age > 120)) {
     throw new apiError(
       400,
-      "Age must be vali number between 1 and 120",
+      "Age must be valid number between 1 and 120",
       "Invalid age"
     );
   }
@@ -511,7 +506,7 @@ export const updateDonorProfile = asyncHandler(async (req, res) => {
 
   let nonEmailFieldsModified = false;
   let responseMessage =
-    "Donor profile updated successfully (no email change requested";
+    "Donor profile updated successfully (no email change requested).";
   let newEmailPendingVerification = null;
 
   //update full name
@@ -569,7 +564,7 @@ export const updateDonorProfile = asyncHandler(async (req, res) => {
     if (existingPendingRegistration) {
       throw new apiError(
         409,
-        "This email is pending verification for a new account registratio. Please check your inbox",
+        "This email is pending verification for a new account registration. Please check your inbox",
         "Email Pending Registration"
       );
     }
@@ -583,8 +578,8 @@ export const updateDonorProfile = asyncHandler(async (req, res) => {
     if (existingPendingEmailChange) {
       throw new apiError(
         409,
-        "This email is already undergoing a change verification process for another account.Please check your inbox or wait for it to expire",
-        "email pending change"
+        "This email is already undergoing a change verification process for another account. Please check your inbox or wait for it to expire",
+        "Email Pending Change"
       );
     }
 
@@ -598,7 +593,7 @@ export const updateDonorProfile = asyncHandler(async (req, res) => {
     if (existingPendingChangeForThisDonor) {
       await tempModel.findByIdAndDelete(existingPendingChangeForThisDonor._id);
       console.log(
-        `Overwriting existing pending email change record for patient ID: ${donorId}. Old temp ID: ${existingPendingChangeForThisDonor._id}`
+        `Overwriting existing pending email change record for donor ID: ${donorId}. Old temp ID: ${existingPendingChangeForThisDonor._id}`
       );
     }
 
@@ -624,7 +619,7 @@ export const updateDonorProfile = asyncHandler(async (req, res) => {
     console.log(tempEmailChangeDoc);
 
     if (!tempEmailChangeDoc) {
-      console.error("Failed to create tempEmailchangeDoc");
+      console.error("Failed to create tempEmailChangeDoc");
       throw new apiError(
         500,
         "Failed to create change request. Please try again",
@@ -671,7 +666,7 @@ export const updateDonorProfile = asyncHandler(async (req, res) => {
       );
     } else {
       responseMessage =
-        "Donor profile updated. Please check your new email to verify the address. until verified, you'll still log in with your old email";
+        "Donor profile updated. Please check your new email to verify the address. Until verified, you'll still log in with your old email.";
       newEmailPendingVerification = newEmailLower;
     }
   } else {
@@ -688,14 +683,18 @@ export const updateDonorProfile = asyncHandler(async (req, res) => {
   if (nonEmailFieldsModified) {
     await donor.save({ validateBeforeSave: true });
   } else {
-    console.log("No non-email fields modified, skipping patient model save.");
+    console.log("No non-email fields modified, skipping donor model save.");
   }
 
   return res.status(200).json(
-    new ApiResponse(200, {
-      donor,
-      newEmailPendingVerification: newEmailPendingVerification,
-    })
+    new ApiResponse(
+      200,
+      {
+        donor,
+        newEmailPendingVerification: newEmailPendingVerification,
+      },
+      responseMessage
+    )
   );
 });
 
@@ -733,12 +732,12 @@ export const verifyDonorNewEmail = asyncHandler(async (req, res) => {
 
   if (!donor) {
     console.warn(
-      `Associated patient account not found for tempId ${tempId}. Cleaning up temp record.`
+      `Associated donor account not found for tempId ${tempId}. Cleaning up temp record.`
     );
     await tempModel.findByIdAndDelete(tempEmailChangeDoc._id);
     throw new apiError(
       404,
-      "Associated patient account not found. Please contact support.",
+      "Associated donor account not found. Please contact support.",
       "Account Not Found"
     );
   }
@@ -747,7 +746,7 @@ export const verifyDonorNewEmail = asyncHandler(async (req, res) => {
     donor.email.toLowerCase() !== tempEmailChangeDoc.data.oldEmail.toLowerCase()
   ) {
     console.warn(
-      `Email mismatch for patient ${donor._id} during new email verification. Current: ${donor.email}, Old in temp: ${tempEmailChangeDoc.data.oldEmail}. Cleaning up temp record.`
+      `Email mismatch for donor ${donor._id} during new email verification. Current: ${donor.email}, Old in temp: ${tempEmailChangeDoc.data.oldEmail}. Cleaning up temp record.`
     );
 
     await tempModel.findByIdAndDelete(tempEmailChangeDoc._id);
