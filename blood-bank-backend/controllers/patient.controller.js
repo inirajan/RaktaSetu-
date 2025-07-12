@@ -15,7 +15,7 @@ export const patientRegisterControl = asyncHandler(async (req, res) => {
 
   //basic validation
   if (!fullName || !age || !bloodGroup || !email || !password) {
-    throw new apiError(400, "provide all fields", "empty Field");
+    throw new apiError(400, "Provide all fields", "Empty Field");
   }
 
   if (typeof age !== "number" || age <= 0 || age > 120) {
@@ -51,12 +51,12 @@ export const patientRegisterControl = asyncHandler(async (req, res) => {
     );
   }
 
-  const exstingPatient = await tempModel.findOne({ email });
+  const exstingPatient = await patientModel.findOne({ email });
   if (exstingPatient) {
     throw new apiError(
       409,
-      "A patient with this email address already exits",
-      "provide new email"
+      "A patient with this email address already exists",
+      "Provide new email"
     );
   }
 
@@ -69,7 +69,7 @@ export const patientRegisterControl = asyncHandler(async (req, res) => {
   if (pendingRegistrationEmail) {
     throw new apiError(
       409,
-      "Email pending verification for registration ",
+      "Email pending verification for registration",
       "Check your email to verify"
     );
   }
@@ -112,7 +112,7 @@ export const patientRegisterControl = asyncHandler(async (req, res) => {
   });
 
   if (!temp) {
-    throw new apiError(500, "Cant Create user", "error");
+    throw new apiError(500, "Can't Create user", "error");
   }
 
   //verify email
@@ -154,7 +154,7 @@ export const patientRegisterControl = asyncHandler(async (req, res) => {
       new ApiResponse(
         201,
         temp,
-        "patient has been register! Check your email to verify"
+        "Patient has been registered! Check your email to verify"
       )
     );
 });
@@ -164,9 +164,10 @@ export const verifyEmail = asyncHandler(async (req, res) => {
   const { token } = req.query;
 
   if (!token) {
-    throw new apiError(404, "Token Not Found", "The Token Doesnt exists");
+    throw new apiError(404, "Token Not Found", "The Token Doesn't exist");
   }
 
+  let decoded;
   try {
     jwt.verify(token, process.env.JWT_SECRET);
   } catch (err) {
@@ -209,6 +210,7 @@ export const verifyEmail = asyncHandler(async (req, res) => {
   const patient = await patientModel.create({
     ...tempDoc.data,
     isEmailVerified: true,
+    role: "patient",
   });
 
   if (!patient) {
@@ -227,7 +229,7 @@ export const verifyEmail = asyncHandler(async (req, res) => {
       new ApiResponse(
         201,
         { patientId: patient._id, email: patient.email },
-        "registeration complete"
+        "Registration complete"
       )
     );
 });
@@ -239,7 +241,7 @@ export const patientLoginController = asyncHandler(async (req, res) => {
   if (!email || !password) {
     throw new apiError(
       400,
-      "Email and password is requires",
+      "Email and password are required",
       "Provide email and password"
     );
   }
@@ -255,17 +257,13 @@ export const patientLoginController = asyncHandler(async (req, res) => {
   }
 
   if (!patient.isEmailVerified) {
-    throw new apiError(
-      403,
-      "email is not verified",
-      "please check  your inbox"
-    );
+    throw new apiError(403, "Email is not verified", "Please check your inbox");
   }
 
   const isPasswordValid = await patient.isPasswordCorrect(password);
 
   if (!isPasswordValid) {
-    throw new apiError(403, "Invalid credentails", "provide password");
+    throw new apiError(403, "Invalid credentials", "Provide password");
   }
 
   const accessToken = await patient.generateAccessToken();
@@ -275,7 +273,7 @@ export const patientLoginController = asyncHandler(async (req, res) => {
 
   const loggedInPatient = {
     _id: patient._id,
-    name: patient.fullName,
+    fullName: patient.fullName,
     email: patient.email,
     role: patient.role,
   };
@@ -294,7 +292,7 @@ export const patientLoginController = asyncHandler(async (req, res) => {
       new ApiResponse(
         200,
         { patient: loggedInPatient, accessToken },
-        "logged in successfully"
+        "Logged in successfully"
       )
     );
 });
@@ -377,7 +375,7 @@ export const requestBloodAsPatient = asyncHandler(async (req, res) => {
   const patientId = req.user._id;
 
   // Basic validation for blood request
-  if (!bloodGroup || !unit) {
+  if (!bloodGroup || !unit || unit <= 0) {
     throw new apiError(
       400,
       "Blood group and unit are required for a blood request.",
@@ -410,7 +408,7 @@ export const requestBloodAsPatient = asyncHandler(async (req, res) => {
       new ApiResponse(
         201,
         newBloodRequest,
-        "Blood request submitted successfully"
+        "Blood request submitted successfully and is pending approval."
       )
     );
 });
@@ -446,8 +444,8 @@ export const getPatientProflie = asyncHandler(async (req, res) => {
   if (!patientProfile) {
     throw new apiError(
       404,
-      "patient profile not found",
-      " patient doesnot exists"
+      "Patient profile not found",
+      "Patient does not exist"
     );
   }
 
